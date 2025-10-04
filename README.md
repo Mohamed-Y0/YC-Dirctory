@@ -2,6 +2,8 @@
 
 **Pitch, Vote & Grow** - A platform for startup founders to pitch their ideas, vote on projects, and connect with the community.
 
+> 📺 Project from [JS Mastery](https://www.youtube.com/@javascriptmastery) YouTube tutorial
+
 ## Tech Stack
 
 - **Next.js 15** (App Router with PPR)
