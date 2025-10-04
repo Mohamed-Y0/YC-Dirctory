@@ -14,23 +14,26 @@
 ## Getting Started
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables:**
    Create a `.env.local` file with:
+
    ```env
    AUTH_GITHUB_ID=your_github_oauth_id
    AUTH_GITHUB_SECRET=your_github_oauth_secret
    AUTH_SECRET=your_auth_secret
    NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
    NEXT_PUBLIC_SANITY_DATASET=production
-   NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+   NEXT_PUBLIC_SANITY_API_VERSION="vX"
    SANITY_WRITE_TOKEN=your_sanity_write_token
    ```
 
 3. **Run development server:**
+
    ```bash
    npm run dev
    ```
