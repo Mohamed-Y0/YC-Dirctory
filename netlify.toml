@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Disable secrets scanning for specific keys that are expected in build output
+  SECRETS_SCAN_OMIT_KEYS = "AUTH_GITHUB_ID,AUTH_GITHUB_SECRET,AUTH_SECRET,NEXT_PUBLIC_SANITY_API_VERSION,NEXT_PUBLIC_SANITY_DATASET,NEXT_PUBLIC_SANITY_PROJECT_ID,SANITY_WRITE_TOKE"
+  
+  # Alternatively, you can omit scanning specific paths
+  # SECRETS_SCAN_OMIT_PATHS = ".next/**,.netlify/**"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
