@@ -2,29 +2,94 @@
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { formSchema } from "@/lib/validation";
+import z from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { createPitch } from "@/lib/actions";
 
-function StartupForm() {
+const StartupForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pitch, setPitch] = useState("");
+  const { toast } = useToast();
+  const router = useRouter();
 
-  const isPending = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleFormSubmit = async (prevState: any, formData: FormData) => {
+    try {
+      const formValues = {
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
+        category: formData.get("category") as string,
+        link: formData.get("link") as string,
+        pitch,
+      };
+
+      await formSchema.parseAsync(formValues);
+
+      const result = await createPitch(prevState, formData, pitch);
+
+      if (result.status == "SUCCESS") {
+        toast({
+          title: "Success",
+          description: "Your startup pitch has been created successfully",
+        });
+
+        router.push(`/startup/${result._id}`);
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErorrs = error.flatten().fieldErrors;
+
+        setErrors(fieldErorrs as unknown as Record<string, string>);
+
+        toast({
+          title: "Error",
+          description: "Please check your inputs and try again",
+          variant: "destructive",
+        });
+
+        return { ...prevState, error: "Validation failed", status: "ERROR" };
+      }
+
+      toast({
+        title: "Error",
+        description: "An unexpected error has occurred",
+        variant: "destructive",
+      });
+
+      return {
+        ...prevState,
+        error: "An unexpected error has occurred",
+        status: "ERROR",
+      };
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [state, formAction, isPending] = useActionState(handleFormSubmit, {
+    error: "",
+    status: "INITIAL",
+  });
 
   return (
-    <form action={() => {}} className="startup-form">
+    <form action={formAction} className="startup-form">
       <div>
         <label htmlFor="title" className="startup-form_label">
           Title
         </label>
         <Input
-          title="title"
           id="title"
+          name="title"
           className="startup-form_input"
-          placeholder="Startup Title"
           required
+          placeholder="Startup Title"
         />
 
         {errors.title && <p className="startup-form_error">{errors.title}</p>}
@@ -32,14 +97,14 @@ function StartupForm() {
 
       <div>
         <label htmlFor="description" className="startup-form_label">
-          description
+          Description
         </label>
         <Textarea
-          title="description"
           id="description"
+          name="description"
           className="startup-form_textarea"
-          placeholder="Startup Description"
           required
+          placeholder="Startup Description"
         />
 
         {errors.description && (
@@ -49,14 +114,14 @@ function StartupForm() {
 
       <div>
         <label htmlFor="category" className="startup-form_label">
-          category
+          Category
         </label>
         <Input
-          title="category"
           id="category"
+          name="category"
           className="startup-form_input"
-          placeholder="Startup Category (Tech, Health..)"
           required
+          placeholder="Startup Category (Tech, Health, Education...)"
         />
 
         {errors.category && (
@@ -69,18 +134,18 @@ function StartupForm() {
           Image URL
         </label>
         <Input
-          title="link"
           id="link"
+          name="link"
           className="startup-form_input"
-          placeholder="Startup Image URL"
           required
+          placeholder="Startup Image URL"
         />
 
         {errors.link && <p className="startup-form_error">{errors.link}</p>}
       </div>
 
       <div data-color-mode="light">
-        <label htmlFor="ptich" className="startup-form_label">
+        <label htmlFor="pitch" className="startup-form_label">
           Pitch
         </label>
 
@@ -113,6 +178,6 @@ function StartupForm() {
       </Button>
     </form>
   );
-}
+};
 
 export default StartupForm;
